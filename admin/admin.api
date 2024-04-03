@@ -1,0 +1,19 @@
+syntax = "v1"
+
+type Request {
+	Name string `path:"name,options=you|me"`
+}
+
+import (
+	"apis/admin/admin.api"
+)
+
+@server (
+	prefix: api/v1/admin
+	group:  admin
+)
+service admin-api {
+	@handler AdminInfoHandler
+	get /info returns (AdminInfo)
+}
+

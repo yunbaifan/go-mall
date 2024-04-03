@@ -1,0 +1,10 @@
+Name: admin-api
+Host: 0.0.0.0
+Port: 8888
+Mysql:
+  Source: root:123456@tcp(host.docker.internal:23306)/go-mall?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+  MaxIdleConns: 10
+  MaxOpenConns: 100
+  SlowThreshold: 1000
+  LogLevel: 4
+  Colorful: true

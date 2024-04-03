@@ -1,3 +1,6 @@
 .idea
 
-template
+template/
+
+testing/
+sql/
