@@ -13,7 +13,31 @@ import (
 	group:  admin
 )
 service admin-api {
+	// 用户登录
+	@handler AdminLoginHandler
+	post /login (LoginRequest) returns (LoginResponse)
+}
+
+@server (
+	prefix:     api/v1/admin
+	group:      admin
+	middleware: JWTAuthToken
+)
+service admin-api {
+	// 获取用户信息
 	@handler AdminInfoHandler
 	get /info returns (AdminInfo)
+
+	// 用户注册
+	@handler AdminRegisterHandler
+	post /register (RegisterRequest) returns (RegisterRequest)
+
+	// 用户退出
+	@handler AdminLogoutHandler
+	post /logout
+
+	// 刷新token
+	@handler RefreshTokenHandler
+	post /refreshToken returns (LoginResponse)
 }
 

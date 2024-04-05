@@ -14,11 +14,40 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodGet,
-				Path:    "/info",
-				Handler: admin.AdminInfoHandler(serverCtx),
+				Method:  http.MethodPost,
+				Path:    "/login",
+				Handler: admin.AdminLoginHandler(serverCtx),
 			},
 		},
+		rest.WithPrefix("/api/v1/admin"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.JWTAuthToken},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/info",
+					Handler: admin.AdminInfoHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/logout",
+					Handler: admin.AdminLogoutHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/refreshToken",
+					Handler: admin.RefreshTokenHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/register",
+					Handler: admin.AdminRegisterHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithPrefix("/api/v1/admin"),
 	)
 }
