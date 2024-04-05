@@ -2,8 +2,10 @@ package svc
 
 import (
 	"github.com/yunbaifan/go-mall/admin/internal/config"
+	"github.com/yunbaifan/go-mall/admin/internal/middleware"
 	"github.com/yunbaifan/go-mall/lib/xorm"
 	"github.com/yunbaifan/go-mall/model"
+	"github.com/zeromicro/go-zero/rest"
 	"log"
 )
 
@@ -14,6 +16,7 @@ type ServiceContext struct {
 	UmsAdminRoleRelationModel model.UmsAdminRoleRelationModel
 	UmsMenuModel              model.UmsMenuModel
 	UmsRoleMenuRelationModel  model.UmsRoleMenuRelationModel
+	JWTAuthToken              rest.Middleware
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -31,5 +34,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		UmsAdminRoleRelationModel: model.NewUmsAdminRoleRelationModel(db),
 		UmsMenuModel:              model.NewUmsMenuModel(db),
 		UmsRoleMenuRelationModel:  model.NewUmsRoleMenuRelationModel(db),
+		JWTAuthToken:              middleware.NewJWTAuthTokenMiddleware(c.Auth).Handle,
 	}
 }

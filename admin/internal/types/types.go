@@ -7,6 +7,16 @@ type AdminInfo struct {
 	Menus []Menus  `json:"menus" default:"[]" description:"菜单列表"`
 }
 
+type LoginRequest struct {
+	Username string `json:"username" description:"用户名" required:"true"`
+	Password string `json:"password" description:"密码" required:"true"`
+}
+
+type LoginResponse struct {
+	Token     string `json:"token" description:"token"`
+	TokenHead string `json:"tokenHead" description:"token头"`
+}
+
 type Menus struct {
 	Id         int    `json:"id" description:"菜单ID"`
 	ParentId   int    `json:"parentId" description:"父级ID"`
@@ -16,6 +26,15 @@ type Menus struct {
 	Sort       int    `json:"sort" description:"排序"`
 	Icon       string `json:"icon" description:"图标"`
 	Hidden     bool   `json:"hidden" description:"是否隐藏"`
+}
+
+type RegisterRequest struct {
+	Username string `json:"username" description:"用户名" validate:"required"`
+	Password string `json:"password" description:"密码" validate:"required,min=6,max=20"`
+	Email    string `json:"email" description:"邮箱" validate:"required,email"`
+	NickName string `json:"nickName" description:"昵称" validate:"required,max=20"`
+	Note     string `json:"note" description:"备注" validate:"max=100"`
+	Status   int64  `json:"status" description:"状态" validate:"required,default=0"`
 }
 
 type Request struct {
