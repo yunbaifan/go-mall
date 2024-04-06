@@ -21,7 +21,7 @@ type (
 		FindOne(ctx context.Context, id int64, preloadList ...string) (*SmsCoupon, error)
 		OrmSession(ctx context.Context) *gorm.DB
 		Transaction(ctx context.Context, fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error
-		FindPageListByBuilder(ormSession *gorm.DB, page, pageSize int64) (*SmsCouponPagination, error)
+		FindPageListByBuilder(ormSession *gorm.DB, keyword *KeywordSmsCouponModel) (*SmsCouponPagination, error)
 		Update(ctx context.Context, data *SmsCoupon) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -63,6 +63,12 @@ type (
 		PageSize    int64
 		TotalCount  int64
 		TotalPage   int64
+	}
+
+	KeywordSmsCouponModel struct {
+		KeywordKey     string //like 关键字
+		KeywordValue   string //like 值
+		Page, PageSize int64
 	}
 )
 
@@ -110,7 +116,9 @@ func (m *defaultSmsCouponModel) Transaction(ctx context.Context, fc func(tx *gor
 	return m.ormConn.WithContext(ctx).Transaction(fc, opts...)
 }
 
-func (m *defaultSmsCouponModel) FindPageListByBuilder(db *gorm.DB, page, pageSize int64) (*SmsCouponPagination, error) {
+func (m *defaultSmsCouponModel) FindPageListByBuilder(db *gorm.DB, keyword *KeywordSmsCouponModel) (*SmsCouponPagination, error) {
+	page := keyword.Page
+	pageSize := keyword.PageSize
 	// 总行数
 	var totalCount int64
 	if err := db.Count(&totalCount).Error; err != nil {
@@ -133,7 +141,9 @@ func (m *defaultSmsCouponModel) FindPageListByBuilder(db *gorm.DB, page, pageSiz
 	if totalCount < ((page - 1) * pageSize) {
 		return resp, nil
 	}
-
+	if keyword.KeywordKey != "" && keyword.KeywordValue != "" {
+		db = db.Where(fmt.Sprintf("%s = ?", keyword.KeywordKey), keyword.KeywordValue)
+	}
 	offset := int((page - 1) * pageSize)
 	if err := db.Offset(offset).Limit(int(pageSize)).Find(&resp.Data).Error; err != nil {
 		return nil, err

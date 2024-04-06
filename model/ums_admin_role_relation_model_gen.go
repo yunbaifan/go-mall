@@ -21,7 +21,7 @@ type (
 		FindOne(ctx context.Context, id int64, preloadList ...string) (*UmsAdminRoleRelation, error)
 		OrmSession(ctx context.Context) *gorm.DB
 		Transaction(ctx context.Context, fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error
-		FindPageListByBuilder(ormSession *gorm.DB, page, pageSize int64) (*UmsAdminRoleRelationPagination, error)
+		FindPageListByBuilder(ormSession *gorm.DB, keyword *KeywordUmsAdminRoleRelationModel) (*UmsAdminRoleRelationPagination, error)
 		Update(ctx context.Context, data *UmsAdminRoleRelation) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -35,7 +35,6 @@ type (
 		Id      int64         `json:"id" gorm:"primary_key"`
 		AdminId sql.NullInt64 `json:"admin_id"`
 		RoleId  sql.NullInt64 `json:"role_id"`
-		//UmsRoles []*UmsRole    `json:"umsRole" gorm:"foreignKey:Id;references:RoleId"`
 		UmsAdminRoleRelationRelation
 	}
 
@@ -49,6 +48,12 @@ type (
 		PageSize    int64
 		TotalCount  int64
 		TotalPage   int64
+	}
+
+	KeywordUmsAdminRoleRelationModel struct {
+		KeywordKey     string //like 关键字
+		KeywordValue   string //like 值
+		Page, PageSize int64
 	}
 )
 
@@ -96,7 +101,9 @@ func (m *defaultUmsAdminRoleRelationModel) Transaction(ctx context.Context, fc f
 	return m.ormConn.WithContext(ctx).Transaction(fc, opts...)
 }
 
-func (m *defaultUmsAdminRoleRelationModel) FindPageListByBuilder(db *gorm.DB, page, pageSize int64) (*UmsAdminRoleRelationPagination, error) {
+func (m *defaultUmsAdminRoleRelationModel) FindPageListByBuilder(db *gorm.DB, keyword *KeywordUmsAdminRoleRelationModel) (*UmsAdminRoleRelationPagination, error) {
+	page := keyword.Page
+	pageSize := keyword.PageSize
 	// 总行数
 	var totalCount int64
 	if err := db.Count(&totalCount).Error; err != nil {
@@ -119,7 +126,9 @@ func (m *defaultUmsAdminRoleRelationModel) FindPageListByBuilder(db *gorm.DB, pa
 	if totalCount < ((page - 1) * pageSize) {
 		return resp, nil
 	}
-
+	if keyword.KeywordKey != "" && keyword.KeywordValue != "" {
+		db = db.Where(fmt.Sprintf("%s = ?", keyword.KeywordKey), keyword.KeywordValue)
+	}
 	offset := int((page - 1) * pageSize)
 	if err := db.Offset(offset).Limit(int(pageSize)).Find(&resp.Data).Error; err != nil {
 		return nil, err

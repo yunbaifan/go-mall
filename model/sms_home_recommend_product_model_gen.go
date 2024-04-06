@@ -21,7 +21,7 @@ type (
 		FindOne(ctx context.Context, id int64, preloadList ...string) (*SmsHomeRecommendProduct, error)
 		OrmSession(ctx context.Context) *gorm.DB
 		Transaction(ctx context.Context, fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error
-		FindPageListByBuilder(ormSession *gorm.DB, page, pageSize int64) (*SmsHomeRecommendProductPagination, error)
+		FindPageListByBuilder(ormSession *gorm.DB, keyword *KeywordSmsHomeRecommendProductModel) (*SmsHomeRecommendProductPagination, error)
 		Update(ctx context.Context, data *SmsHomeRecommendProduct) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -50,6 +50,12 @@ type (
 		PageSize    int64
 		TotalCount  int64
 		TotalPage   int64
+	}
+
+	KeywordSmsHomeRecommendProductModel struct {
+		KeywordKey     string //like 关键字
+		KeywordValue   string //like 值
+		Page, PageSize int64
 	}
 )
 
@@ -97,7 +103,9 @@ func (m *defaultSmsHomeRecommendProductModel) Transaction(ctx context.Context, f
 	return m.ormConn.WithContext(ctx).Transaction(fc, opts...)
 }
 
-func (m *defaultSmsHomeRecommendProductModel) FindPageListByBuilder(db *gorm.DB, page, pageSize int64) (*SmsHomeRecommendProductPagination, error) {
+func (m *defaultSmsHomeRecommendProductModel) FindPageListByBuilder(db *gorm.DB, keyword *KeywordSmsHomeRecommendProductModel) (*SmsHomeRecommendProductPagination, error) {
+	page := keyword.Page
+	pageSize := keyword.PageSize
 	// 总行数
 	var totalCount int64
 	if err := db.Count(&totalCount).Error; err != nil {
@@ -120,7 +128,9 @@ func (m *defaultSmsHomeRecommendProductModel) FindPageListByBuilder(db *gorm.DB,
 	if totalCount < ((page - 1) * pageSize) {
 		return resp, nil
 	}
-
+	if keyword.KeywordKey != "" && keyword.KeywordValue != "" {
+		db = db.Where(fmt.Sprintf("%s = ?", keyword.KeywordKey), keyword.KeywordValue)
+	}
 	offset := int((page - 1) * pageSize)
 	if err := db.Offset(offset).Limit(int(pageSize)).Find(&resp.Data).Error; err != nil {
 		return nil, err

@@ -21,7 +21,7 @@ type (
 		FindOne(ctx context.Context, id int64, preloadList ...string) (*CmsMemberReport, error)
 		OrmSession(ctx context.Context) *gorm.DB
 		Transaction(ctx context.Context, fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error
-		FindPageListByBuilder(ormSession *gorm.DB, page, pageSize int64) (*CmsMemberReportPagination, error)
+		FindPageListByBuilder(ormSession *gorm.DB, keyword *KeywordCmsMemberReportModel) (*CmsMemberReportPagination, error)
 		Update(ctx context.Context, data *CmsMemberReport) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -53,6 +53,12 @@ type (
 		PageSize    int64
 		TotalCount  int64
 		TotalPage   int64
+	}
+
+	KeywordCmsMemberReportModel struct {
+		KeywordKey     string //like 关键字
+		KeywordValue   string //like 值
+		Page, PageSize int64
 	}
 )
 
@@ -100,7 +106,9 @@ func (m *defaultCmsMemberReportModel) Transaction(ctx context.Context, fc func(t
 	return m.ormConn.WithContext(ctx).Transaction(fc, opts...)
 }
 
-func (m *defaultCmsMemberReportModel) FindPageListByBuilder(db *gorm.DB, page, pageSize int64) (*CmsMemberReportPagination, error) {
+func (m *defaultCmsMemberReportModel) FindPageListByBuilder(db *gorm.DB, keyword *KeywordCmsMemberReportModel) (*CmsMemberReportPagination, error) {
+	page := keyword.Page
+	pageSize := keyword.PageSize
 	// 总行数
 	var totalCount int64
 	if err := db.Count(&totalCount).Error; err != nil {
@@ -123,7 +131,9 @@ func (m *defaultCmsMemberReportModel) FindPageListByBuilder(db *gorm.DB, page, p
 	if totalCount < ((page - 1) * pageSize) {
 		return resp, nil
 	}
-
+	if keyword.KeywordKey != "" && keyword.KeywordValue != "" {
+		db = db.Where(fmt.Sprintf("%s = ?", keyword.KeywordKey), keyword.KeywordValue)
+	}
 	offset := int((page - 1) * pageSize)
 	if err := db.Offset(offset).Limit(int(pageSize)).Find(&resp.Data).Error; err != nil {
 		return nil, err

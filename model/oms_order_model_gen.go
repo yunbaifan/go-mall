@@ -21,7 +21,7 @@ type (
 		FindOne(ctx context.Context, id int64, preloadList ...string) (*OmsOrder, error)
 		OrmSession(ctx context.Context) *gorm.DB
 		Transaction(ctx context.Context, fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error
-		FindPageListByBuilder(ormSession *gorm.DB, page, pageSize int64) (*OmsOrderPagination, error)
+		FindPageListByBuilder(ormSession *gorm.DB, keyword *KeywordOmsOrderModel) (*OmsOrderPagination, error)
 		Update(ctx context.Context, data *OmsOrder) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -90,6 +90,12 @@ type (
 		TotalCount  int64
 		TotalPage   int64
 	}
+
+	KeywordOmsOrderModel struct {
+		KeywordKey     string //like 关键字
+		KeywordValue   string //like 值
+		Page, PageSize int64
+	}
 )
 
 func newOmsOrderModel(db *gorm.DB) *defaultOmsOrderModel {
@@ -136,7 +142,9 @@ func (m *defaultOmsOrderModel) Transaction(ctx context.Context, fc func(tx *gorm
 	return m.ormConn.WithContext(ctx).Transaction(fc, opts...)
 }
 
-func (m *defaultOmsOrderModel) FindPageListByBuilder(db *gorm.DB, page, pageSize int64) (*OmsOrderPagination, error) {
+func (m *defaultOmsOrderModel) FindPageListByBuilder(db *gorm.DB, keyword *KeywordOmsOrderModel) (*OmsOrderPagination, error) {
+	page := keyword.Page
+	pageSize := keyword.PageSize
 	// 总行数
 	var totalCount int64
 	if err := db.Count(&totalCount).Error; err != nil {
@@ -159,7 +167,9 @@ func (m *defaultOmsOrderModel) FindPageListByBuilder(db *gorm.DB, page, pageSize
 	if totalCount < ((page - 1) * pageSize) {
 		return resp, nil
 	}
-
+	if keyword.KeywordKey != "" && keyword.KeywordValue != "" {
+		db = db.Where(fmt.Sprintf("%s = ?", keyword.KeywordKey), keyword.KeywordValue)
+	}
 	offset := int((page - 1) * pageSize)
 	if err := db.Offset(offset).Limit(int(pageSize)).Find(&resp.Data).Error; err != nil {
 		return nil, err
