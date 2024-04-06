@@ -1,8 +1,8 @@
 syntax = "v1"
 
 type LoginRequest {
-    Username string `json:"username" description:"用户名" required:"true"`
-    Password string `json:"password" description:"密码" required:"true"`
+    Username string `validate:"required, min=6, max=20" json:"username" description:"用户名"`
+    Password string `validate:"required, min=6, max=20" json:"password" description:"密码"`
 }
 
 type LoginResponse {
@@ -35,4 +35,60 @@ type RegisterRequest {
     NickName string `json:"nickName" description:"昵称" validate:"required,max=20"`
     Note string `json:"note" description:"备注" validate:"max=100"`
     Status int64 `json:"status" description:"状态" validate:"required,default=0"`
+}
+
+type AdminListRequest {
+    Keyword string `json:"keyword" description:"关键字" validate:"omitempty"`
+    PageSize int64 `json:"pageSize" description:"每页数量" validate:"required,default=10"`
+    PageNum int64 `json:"pageNum" description:"页码" validate:"required,default=1"`
+}
+
+
+type AdminListResponse {
+    Total int64 `json:"total" description:"总数"`
+    List []AdminResponse `json:"list" description:"列表"`
+    PageNum int64 `json:"pageNum" description:"页码"`
+    PageSize int64 `json:"pageSize" description:"每页数量"`
+    TotalPage int64 `json:"totalPage" description:"总页数"`
+}
+
+type AdminResponse {
+    ID int64 `json:"id" description:"ID"`
+    Username string `json:"username" description:"用户名"`
+    Password string `json:"password" description:"密码"`
+    Icon string `json:"icon" description:"头像"`
+    Email string `json:"email" description:"邮箱"`
+    NickName string `json:"nickName" description:"昵称"`
+    Note string `json:"note" description:"备注"`
+    CreateTime string `json:"createTime" description:"创建时间"`
+    LoginTime string `json:"loginTime" description:"登录时间"`
+    Status int64 `json:"status" description:"状态"`
+}
+
+
+type AdminGetItemRequest {
+    UserID int64 `path:"userId" description:"用户ID" validate:"required"`
+}
+
+type AdminRoleUpdateRequest {
+    AdminId int64 `json:"adminId" description:"用户ID" validate:"required"`
+    RoleIDs string `json:"roleIds" description:"角色ID列表" validate:"required"`
+}
+
+type AdminRoleUpdateResponse {
+    Count int64 `json:"count" description:"更新数量"`
+}
+
+type AdminRoleListRequest{
+    AdminId int64 `path:"adminId" description:"用户ID" validate:"required"`
+}
+
+type AdminRoleListResponse{
+    Id int64 `json:"id" description:"ID"`
+    Name string `json:"name" description:"名称"`
+    Description string `json:"description" description:"描述"`
+    AdminCount int64 `json:"adminCount" description:"用户数量"`
+    CreateTime string `json:"createTime" description:"创建时间"`
+    Status int64 `json:"status" description:"状态"`
+    Sort int64 `json:"sort" description:"排序"`
 }

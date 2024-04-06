@@ -8,3 +8,6 @@ Mysql:
   SlowThreshold: 1000
   LogLevel: 4
   Colorful: true
+Auth:
+  JwtSecret: "@G5U5*hY2e3E"
+  Expire: 7200

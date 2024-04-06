@@ -37,7 +37,22 @@ service admin-api {
 	post /logout
 
 	// 刷新token
-	@handler RefreshTokenHandler
+	@handler RefreshTokenHandler // 刷新token
 	post /refreshToken returns (LoginResponse)
+
+	@handler AdminListHandler // 获取用户列表
+	post /list (AdminListRequest) returns (AdminListResponse)
+
+	@handler AdminGetItemHandler // 获取单个用户信息
+	get /:userId (AdminGetItemRequest) returns (AdminResponse)
+
+	@handler AdminRoleUpdateHandler // 更新用户权限
+	post /role/update (AdminRoleUpdateRequest) returns (AdminRoleUpdateResponse)
+
+	@handler AdminRoleListHandler // 获取单用户的权限
+	get /role/:adminId (AdminRoleListRequest) returns ([]AdminRoleListResponse)
+
+	@handler AdminUpdateStatusHandler // 更新用户状态
+	post /updateStatus/:userId (AdminGetItemRequest) returns (AdminRoleUpdateResponse)
 }
 
