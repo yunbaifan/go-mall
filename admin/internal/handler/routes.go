@@ -28,8 +28,18 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
+					Path:    "/:userId",
+					Handler: admin.AdminGetItemHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
 					Path:    "/info",
 					Handler: admin.AdminInfoHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: admin.AdminListHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
@@ -45,6 +55,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPost,
 					Path:    "/register",
 					Handler: admin.AdminRegisterHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/role/:adminId",
+					Handler: admin.AdminRoleListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/role/update",
+					Handler: admin.AdminRoleUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/updateStatus/:userId",
+					Handler: admin.AdminUpdateStatusHandler(serverCtx),
 				},
 			}...,
 		),

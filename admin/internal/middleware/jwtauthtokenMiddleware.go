@@ -28,7 +28,6 @@ func (m *JWTAuthTokenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc 
 			return
 		}
 		type MyCustomClaims struct {
-			Foo string `json:"foo"`
 			Sub string `json:"sub"`
 			UID int    `json:"uid"`
 		}
