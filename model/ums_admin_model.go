@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +18,7 @@ type (
 
 	// 另外一个接口
 	umsAdminInter interface {
-		// add custom methods here
+		FindOneByUserName(ctx context.Context, username string) (*UmsAdmin, error)
 	}
 
 	customUmsAdminModel struct {
@@ -33,5 +34,18 @@ type (
 func NewUmsAdminModel(db *gorm.DB) UmsAdminModel {
 	return &customUmsAdminModel{
 		defaultUmsAdminModel: newUmsAdminModel(db),
+	}
+}
+
+func (d *defaultUmsAdminModel) FindOneByUserName(ctx context.Context, username string) (*UmsAdmin, error) {
+	var mm UmsAdmin
+	err := d.OrmSession(ctx).Where("username = ?", username).First(&mm).Error
+	switch err {
+	case nil:
+		return &mm, nil
+	case gorm.ErrRecordNotFound:
+		return nil, gorm.ErrRecordNotFound
+	default:
+		return nil, err
 	}
 }

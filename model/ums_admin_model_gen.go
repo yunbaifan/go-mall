@@ -22,7 +22,7 @@ type (
 		FindOne(ctx context.Context, id int64, preloadList ...string) (*UmsAdmin, error)
 		OrmSession(ctx context.Context) *gorm.DB
 		Transaction(ctx context.Context, fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error
-		FindPageListByBuilder(ormSession *gorm.DB, keyword *KeywordUmsAdminModel) (*UmsAdminPagination, error)
+		FindPageListByBuilder(ctx context.Context, keyword *KeywordUmsAdminModel) (*UmsAdminPagination, error)
 		Update(ctx context.Context, data *UmsAdmin) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -109,11 +109,12 @@ func (m *defaultUmsAdminModel) Transaction(ctx context.Context, fc func(tx *gorm
 	return m.ormConn.WithContext(ctx).Transaction(fc, opts...)
 }
 
-func (m *defaultUmsAdminModel) FindPageListByBuilder(db *gorm.DB, keyword *KeywordUmsAdminModel) (*UmsAdminPagination, error) {
+func (m *defaultUmsAdminModel) FindPageListByBuilder(ctx context.Context, keyword *KeywordUmsAdminModel) (*UmsAdminPagination, error) {
 	page := keyword.Page
 	pageSize := keyword.PageSize
 	// 总行数
 	var totalCount int64
+	db := m.OrmSession(ctx)
 	if err := db.Count(&totalCount).Error; err != nil {
 		return nil, err
 	}

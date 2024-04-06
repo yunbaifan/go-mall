@@ -22,7 +22,7 @@ type (
 		FindOne(ctx context.Context, id int64, preloadList ...string) (*UmsIntegrationConsumeSetting, error)
 		OrmSession(ctx context.Context) *gorm.DB
 		Transaction(ctx context.Context, fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error
-		FindPageListByBuilder(ormSession *gorm.DB, keyword *KeywordUmsIntegrationConsumeSettingModel) (*UmsIntegrationConsumeSettingPagination, error)
+		FindPageListByBuilder(ctx context.Context, keyword *KeywordUmsIntegrationConsumeSettingModel) (*UmsIntegrationConsumeSettingPagination, error)
 		Update(ctx context.Context, data *UmsIntegrationConsumeSetting) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -104,11 +104,12 @@ func (m *defaultUmsIntegrationConsumeSettingModel) Transaction(ctx context.Conte
 	return m.ormConn.WithContext(ctx).Transaction(fc, opts...)
 }
 
-func (m *defaultUmsIntegrationConsumeSettingModel) FindPageListByBuilder(db *gorm.DB, keyword *KeywordUmsIntegrationConsumeSettingModel) (*UmsIntegrationConsumeSettingPagination, error) {
+func (m *defaultUmsIntegrationConsumeSettingModel) FindPageListByBuilder(ctx context.Context, keyword *KeywordUmsIntegrationConsumeSettingModel) (*UmsIntegrationConsumeSettingPagination, error) {
 	page := keyword.Page
 	pageSize := keyword.PageSize
 	// 总行数
 	var totalCount int64
+	db := m.OrmSession(ctx)
 	if err := db.Count(&totalCount).Error; err != nil {
 		return nil, err
 	}

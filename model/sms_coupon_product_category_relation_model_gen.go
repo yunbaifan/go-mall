@@ -22,7 +22,7 @@ type (
 		FindOne(ctx context.Context, id int64, preloadList ...string) (*SmsCouponProductCategoryRelation, error)
 		OrmSession(ctx context.Context) *gorm.DB
 		Transaction(ctx context.Context, fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error
-		FindPageListByBuilder(ormSession *gorm.DB, keyword *KeywordSmsCouponProductCategoryRelationModel) (*SmsCouponProductCategoryRelationPagination, error)
+		FindPageListByBuilder(ctx context.Context, keyword *KeywordSmsCouponProductCategoryRelationModel) (*SmsCouponProductCategoryRelationPagination, error)
 		Update(ctx context.Context, data *SmsCouponProductCategoryRelation) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -104,11 +104,12 @@ func (m *defaultSmsCouponProductCategoryRelationModel) Transaction(ctx context.C
 	return m.ormConn.WithContext(ctx).Transaction(fc, opts...)
 }
 
-func (m *defaultSmsCouponProductCategoryRelationModel) FindPageListByBuilder(db *gorm.DB, keyword *KeywordSmsCouponProductCategoryRelationModel) (*SmsCouponProductCategoryRelationPagination, error) {
+func (m *defaultSmsCouponProductCategoryRelationModel) FindPageListByBuilder(ctx context.Context, keyword *KeywordSmsCouponProductCategoryRelationModel) (*SmsCouponProductCategoryRelationPagination, error) {
 	page := keyword.Page
 	pageSize := keyword.PageSize
 	// 总行数
 	var totalCount int64
+	db := m.OrmSession(ctx)
 	if err := db.Count(&totalCount).Error; err != nil {
 		return nil, err
 	}

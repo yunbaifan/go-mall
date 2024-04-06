@@ -22,7 +22,7 @@ type (
 		FindOne(ctx context.Context, id int64, preloadList ...string) (*PmsProductCategoryAttributeRelation, error)
 		OrmSession(ctx context.Context) *gorm.DB
 		Transaction(ctx context.Context, fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error
-		FindPageListByBuilder(ormSession *gorm.DB, keyword *KeywordPmsProductCategoryAttributeRelationModel) (*PmsProductCategoryAttributeRelationPagination, error)
+		FindPageListByBuilder(ctx context.Context, keyword *KeywordPmsProductCategoryAttributeRelationModel) (*PmsProductCategoryAttributeRelationPagination, error)
 		Update(ctx context.Context, data *PmsProductCategoryAttributeRelation) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -102,11 +102,12 @@ func (m *defaultPmsProductCategoryAttributeRelationModel) Transaction(ctx contex
 	return m.ormConn.WithContext(ctx).Transaction(fc, opts...)
 }
 
-func (m *defaultPmsProductCategoryAttributeRelationModel) FindPageListByBuilder(db *gorm.DB, keyword *KeywordPmsProductCategoryAttributeRelationModel) (*PmsProductCategoryAttributeRelationPagination, error) {
+func (m *defaultPmsProductCategoryAttributeRelationModel) FindPageListByBuilder(ctx context.Context, keyword *KeywordPmsProductCategoryAttributeRelationModel) (*PmsProductCategoryAttributeRelationPagination, error) {
 	page := keyword.Page
 	pageSize := keyword.PageSize
 	// 总行数
 	var totalCount int64
+	db := m.OrmSession(ctx)
 	if err := db.Count(&totalCount).Error; err != nil {
 		return nil, err
 	}

@@ -22,7 +22,7 @@ type (
 		FindOne(ctx context.Context, id int64, preloadList ...string) (*SmsHomeBrand, error)
 		OrmSession(ctx context.Context) *gorm.DB
 		Transaction(ctx context.Context, fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error
-		FindPageListByBuilder(ormSession *gorm.DB, keyword *KeywordSmsHomeBrandModel) (*SmsHomeBrandPagination, error)
+		FindPageListByBuilder(ctx context.Context, keyword *KeywordSmsHomeBrandModel) (*SmsHomeBrandPagination, error)
 		Update(ctx context.Context, data *SmsHomeBrand) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -104,11 +104,12 @@ func (m *defaultSmsHomeBrandModel) Transaction(ctx context.Context, fc func(tx *
 	return m.ormConn.WithContext(ctx).Transaction(fc, opts...)
 }
 
-func (m *defaultSmsHomeBrandModel) FindPageListByBuilder(db *gorm.DB, keyword *KeywordSmsHomeBrandModel) (*SmsHomeBrandPagination, error) {
+func (m *defaultSmsHomeBrandModel) FindPageListByBuilder(ctx context.Context, keyword *KeywordSmsHomeBrandModel) (*SmsHomeBrandPagination, error) {
 	page := keyword.Page
 	pageSize := keyword.PageSize
 	// 总行数
 	var totalCount int64
+	db := m.OrmSession(ctx)
 	if err := db.Count(&totalCount).Error; err != nil {
 		return nil, err
 	}
