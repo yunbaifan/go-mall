@@ -3,6 +3,7 @@ package svc
 import (
 	"github.com/yunbaifan/go-mall/admin/internal/config"
 	"github.com/yunbaifan/go-mall/admin/internal/middleware"
+	"github.com/yunbaifan/go-mall/admin/internal/publicLogic"
 	"github.com/yunbaifan/go-mall/lib/xorm"
 	"github.com/yunbaifan/go-mall/model"
 	"github.com/zeromicro/go-zero/rest"
@@ -17,6 +18,7 @@ type ServiceContext struct {
 	UmsMenuModel              model.UmsMenuModel
 	UmsRoleMenuRelationModel  model.UmsRoleMenuRelationModel
 	JWTAuthToken              rest.Middleware
+	ResponseInter             publicLogic.ResponseInter
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -35,5 +37,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		UmsMenuModel:              model.NewUmsMenuModel(db),
 		UmsRoleMenuRelationModel:  model.NewUmsRoleMenuRelationModel(db),
 		JWTAuthToken:              middleware.NewJWTAuthTokenMiddleware(c.Auth).Handle,
+		ResponseInter:             publicLogic.NewResponseInter(c.Lang),
 	}
 }

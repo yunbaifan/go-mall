@@ -11,3 +11,4 @@ Mysql:
 Auth:
   JwtSecret: "@G5U5*hY2e3E"
   Expire: 7200
+Lang: zh

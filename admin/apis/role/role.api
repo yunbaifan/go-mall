@@ -1,0 +1,22 @@
+syntax = "v1"
+
+type RoleRequest {
+    Id int `json:"id" validate:"required"`
+    Name string `json:"name" validate:"required,min=6,max=32"`
+    Description string `json:"description" validate:"required,min=6,max=64"`
+    AdminCount int `json:"adminCount" validate:"required" default:"0"`
+    Status int `json:"status" validate:"required" default:"1"`
+}
+
+type RoleCountResponse {
+    Count int64 `json:"count" description:"更新数量"`
+}
+
+type RoleDeleteRequest{
+    Id int `json:"id" validate:"required"`
+}
+
+type RoleListRequest{
+    Page int `validate:"required" default:"1" form:"page"`
+    PageSize int `validate:"required" form:"pageSize" default:"10"`
+}

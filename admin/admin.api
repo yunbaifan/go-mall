@@ -6,6 +6,7 @@ type Request {
 
 import (
 	"apis/admin/admin.api"
+	"apis/role/role.api"
 )
 
 @server (
@@ -47,12 +48,36 @@ service admin-api {
 	get /:userId (AdminGetItemRequest) returns (AdminResponse)
 
 	@handler AdminRoleUpdateHandler // 更新用户权限
-	post /role/update (AdminRoleUpdateRequest) returns (AdminRoleUpdateResponse)
+	post /role/update (AdminRoleUpdateRequest) returns (AdminCountResponse)
 
 	@handler AdminRoleListHandler // 获取单用户的权限
 	get /role/:adminId (AdminRoleListRequest) returns ([]AdminRoleListResponse)
 
 	@handler AdminUpdateStatusHandler // 更新用户状态
-	post /updateStatus/:userId (AdminGetItemRequest) returns (AdminRoleUpdateResponse)
+	post /updateStatus/:userId (AdminGetItemRequest) returns (AdminCountResponse)
+
+	@handler AdminDeleteHandler // 删除用户
+	post /delete/:userId (AdminGetItemRequest) returns (AdminCountResponse)
+
+	@handler AdminUpdatePasswordHandler // 更新用户密码
+	post /updatePassword (UpdatePasswordRequest) returns (AdminCountResponse)
+}
+
+@server (
+	prefix: api/v1/role
+	group:  role
+)
+service admin-api {
+	@handler RoleCreateHandler // 创建角色
+	post /create (RoleRequest) returns (RoleCountResponse)
+
+	@handler RoleUpdateHandler // 更新角色
+	post /update/roleId (RoleRequest) returns (RoleCountResponse)
+
+	@handler RoleDeleteHandler // 删除角色
+	post /delete (RoleDeleteRequest) returns (RoleCountResponse)
+
+	@handler RoleListHandler // 获取角色列表
+	get /listAll (RoleListRequest) returns ([]RoleRequest)
 }
 
