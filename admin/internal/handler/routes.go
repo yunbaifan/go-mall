@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	admin "github.com/yunbaifan/go-mall/admin/internal/handler/admin"
+	role "github.com/yunbaifan/go-mall/admin/internal/handler/role"
 	"github.com/yunbaifan/go-mall/admin/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -30,6 +31,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/:userId",
 					Handler: admin.AdminGetItemHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete/:userId",
+					Handler: admin.AdminDeleteHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodGet,
@@ -68,11 +74,42 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
+					Path:    "/updatePassword",
+					Handler: admin.AdminUpdatePasswordHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
 					Path:    "/updateStatus/:userId",
 					Handler: admin.AdminUpdateStatusHandler(serverCtx),
 				},
 			}...,
 		),
 		rest.WithPrefix("/api/v1/admin"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/create",
+				Handler: role.RoleCreateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/delete",
+				Handler: role.RoleDeleteHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/listAll",
+				Handler: role.RoleListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/update/roleId",
+				Handler: role.RoleUpdateHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api/v1/role"),
 	)
 }

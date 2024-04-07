@@ -12,9 +12,9 @@ import (
 	"github.com/yunbaifan/go-mall/lib/xcode"
 )
 
-func AdminRegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func AdminDeleteHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.RegisterRequest
+		var req types.AdminGetItemRequest
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
@@ -23,8 +23,8 @@ func AdminRegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
-		l := admin.NewAdminRegisterLogic(r.Context(), svcCtx)
-		resp, err := l.AdminRegister(&req)
+		l := admin.NewAdminDeleteLogic(r.Context(), svcCtx)
+		resp, err := l.AdminDelete(&req)
 
 		lang := svcCtx.Config.Lang
 		var (

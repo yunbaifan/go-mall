@@ -4,10 +4,12 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/zeromicro/go-zero/rest/httpx"
+
 	"github.com/yunbaifan/go-mall/admin/internal/logic/admin"
 	"github.com/yunbaifan/go-mall/admin/internal/svc"
 	"github.com/yunbaifan/go-mall/admin/internal/types"
-	"github.com/zeromicro/go-zero/rest/httpx"
+	"github.com/yunbaifan/go-mall/lib/xcode"
 )
 
 func AdminLoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -23,10 +25,13 @@ func AdminLoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 		l := admin.NewAdminLoginLogic(r.Context(), svcCtx)
 		resp, err := l.AdminLogin(&req)
-		if err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
-		}
+
+		lang := svcCtx.Config.Lang
+		var (
+			formatResp interface{}
+		)
+		formatResp = xcode.SuccessResponse(resp, lang)
+
+		xcode.HttpResponse(r, w, formatResp, err, lang)
 	}
 }
