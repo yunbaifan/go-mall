@@ -75,7 +75,7 @@ type AdminRoleUpdateRequest {
     RoleIDs string `json:"roleIds" description:"角色ID列表" validate:"required"`
 }
 
-type AdminRoleUpdateResponse {
+type AdminCountResponse {
     Count int64 `json:"count" description:"更新数量"`
 }
 
@@ -91,4 +91,10 @@ type AdminRoleListResponse{
     CreateTime string `json:"createTime" description:"创建时间"`
     Status int64 `json:"status" description:"状态"`
     Sort int64 `json:"sort" description:"排序"`
+}
+
+type UpdatePasswordRequest{
+    UserID int64 `json:"userId" description:"用户ID" validate:"required"`
+    OldPassword string `json:"oldPassword" description:"旧密码" validate:"required"`
+    NewPassword string `json:"newPassword" description:"新密码" validate:"required"`
 }

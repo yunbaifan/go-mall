@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/yunbaifan/go-mall/lib/xorm"
 	"github.com/zeromicro/go-zero/rest"
+	"golang.org/x/text/language"
 )
 
 type Config struct {
@@ -10,6 +11,7 @@ type Config struct {
 	// mysql database config
 	MySQL xorm.DatabaseConf `json:"mysql" yaml:"mysql"`
 	Auth  Auth              `json:"auth"`
+	Lang  language.Tag      `json:"lang" default:"zh"`
 }
 
 type Auth struct {
