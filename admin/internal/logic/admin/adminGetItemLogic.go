@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/yunbaifan/go-mall/admin/internal/svc"
 	"github.com/yunbaifan/go-mall/admin/internal/types"
+	"github.com/yunbaifan/go-mall/lib/xcode"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,7 +29,7 @@ func (l *AdminGetItemLogic) AdminGetItem(req *types.AdminGetItemRequest) (resp *
 		l.Logger.Errorf("AdminGetItemLogic.AdminGetItem.FindOne",
 			logx.Field("err", err),
 		)
-		return
+		return nil, l.svcCtx.ResponseInter.Error(xcode.ErrDataNotFoundFailed)
 	}
 	return &types.AdminResponse{
 		ID:         res.Id,

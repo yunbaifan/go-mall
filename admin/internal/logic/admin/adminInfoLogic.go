@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/yunbaifan/go-mall/admin/internal/svc"
 	"github.com/yunbaifan/go-mall/admin/internal/types"
+	"github.com/yunbaifan/go-mall/lib/xcode"
 	"github.com/yunbaifan/go-mall/model"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -36,7 +37,7 @@ func (l *AdminInfoLogic) AdminInfo() (resp *types.AdminInfo, err error) {
 		l.Logger.Errorf("AdminLogic.Admin",
 			logx.Field("err", err),
 		)
-		return
+		return nil, l.svcCtx.ResponseInter.Error(xcode.ErrDataNotFoundFailed)
 	}
 	roles := make([]string, 0, 0)
 	roles = append(roles, res.UmsAdminRoleRelationRelation.UmsRoles.Name.String)
@@ -52,7 +53,7 @@ func (l *AdminInfoLogic) AdminInfo() (resp *types.AdminInfo, err error) {
 		l.Logger.Errorf("AdminInfo.FindByRoleID",
 			logx.Field("err", err),
 		)
-		return
+		return nil, l.svcCtx.ResponseInter.Error(xcode.ErrDataNotFoundFailed)
 	}
 	menus := make([]types.Menus, 0, len(data))
 	for k := range data {

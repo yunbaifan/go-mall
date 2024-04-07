@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 	"database/sql"
+	"github.com/yunbaifan/go-mall/lib/xcode"
 	"github.com/yunbaifan/go-mall/model"
 	"strconv"
 	"strings"
@@ -27,13 +28,13 @@ func NewAdminRoleUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *A
 	}
 }
 
-func (l *AdminRoleUpdateLogic) AdminRoleUpdate(req *types.AdminRoleUpdateRequest) (resp *types.AdminRoleUpdateResponse, err error) {
+func (l *AdminRoleUpdateLogic) AdminRoleUpdate(req *types.AdminRoleUpdateRequest) (resp *types.AdminCountResponse, err error) {
 	//先根据 adminId 删除所有关联关系
 	if err = l.svcCtx.UmsAdminRoleRelationModel.DeleteByAdminID(l.ctx, req.AdminId); err != nil {
 		l.Logger.Errorf("AdminRoleUpdateLogic.UmsAdminRoleRelationModel.DeleteByAdminID",
 			logx.Field("err", err),
 		)
-		return
+		return nil, l.svcCtx.ResponseInter.Error(xcode.ErrDataDeleteFailed)
 	}
 	roleIds := strings.Split(req.RoleIDs, ",")
 	list := make([]*model.UmsAdminRoleRelation, 0, len(roleIds))
@@ -61,10 +62,10 @@ func (l *AdminRoleUpdateLogic) AdminRoleUpdate(req *types.AdminRoleUpdateRequest
 		l.Logger.Errorf("AdminRoleUpdateLogic.UmsAdminRoleRelationModel.InsertMulti",
 			logx.Field("err", err),
 		)
-		return
+		return nil, l.svcCtx.ResponseInter.Error(xcode.ErrDataInsertFailed)
 	}
 	// 然后重新插入
-	return &types.AdminRoleUpdateResponse{
+	return &types.AdminCountResponse{
 		Count: rowsAffected,
 	}, nil
 }

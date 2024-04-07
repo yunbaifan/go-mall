@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"github.com/yunbaifan/go-mall/lib/xcode"
 
 	"github.com/yunbaifan/go-mall/admin/internal/svc"
 	"github.com/yunbaifan/go-mall/admin/internal/types"
@@ -29,7 +30,7 @@ func (l *AdminRoleListLogic) AdminRoleList(req *types.AdminRoleListRequest) (res
 		l.Logger.Errorf("AdminRoleListLogic.AdminRoleList.FindOne",
 			logx.Field("err", err),
 		)
-		return
+		return nil, l.svcCtx.ResponseInter.Error(xcode.ErrDataNotFoundFailed)
 	}
 	return []types.AdminRoleListResponse{
 		{

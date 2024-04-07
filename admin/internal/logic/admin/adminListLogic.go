@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"github.com/yunbaifan/go-mall/lib/xcode"
 	"github.com/yunbaifan/go-mall/model"
 
 	"github.com/yunbaifan/go-mall/admin/internal/svc"
@@ -33,7 +34,7 @@ func (l *AdminListLogic) AdminList(req *types.AdminListRequest) (resp *types.Adm
 	})
 	if err != nil {
 		l.Logger.Errorf("AdminList.UmsAdminModel.FindPageListByBuilder error: %v req:%v", err, req)
-		return
+		return nil, l.svcCtx.ResponseInter.Error(xcode.ErrDataNotFoundFailed)
 	}
 	list := make([]types.AdminResponse, 0, len(res.Data))
 	for k := range res.Data {
